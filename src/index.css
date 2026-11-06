@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #080d1a;
+  color: #e2e8f0;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbars for financial terminal density */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b132b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+.terminal-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 0.75rem;
+}
+
+.terminal-card:hover {
+  border-color: #334155;
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.25);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.25);
+}
