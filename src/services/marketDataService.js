@@ -124,10 +124,22 @@ class MarketDataService {
       fetchSecFilings(cleanSymbol, config.secUserAgent),
     ]);
 
-    // Consolidate live data with base data
-    const livePrice = finnhubQuote?.price || twelveQuote?.price || baseStock.price;
-    const liveChange = finnhubQuote?.change ?? twelveQuote?.change ?? baseStock.change;
-    const livePercent = finnhubQuote?.changePercent ?? twelveQuote?.changePercent ?? baseStock.changePercent;
+    // Consolidate live data with base data and enforce clean 2-decimal formatting
+    const rawPrice = finnhubQuote?.price ?? twelveQuote?.price ?? baseStock.price;
+    const rawChange = finnhubQuote?.change ?? twelveQuote?.change ?? baseStock.change;
+    const rawPercent = finnhubQuote?.changePercent ?? twelveQuote?.changePercent ?? baseStock.changePercent;
+
+    const livePrice = typeof rawPrice === 'number' ? Number(rawPrice.toFixed(2)) : rawPrice;
+    const liveChange = typeof rawChange === 'number' ? Number(rawChange.toFixed(2)) : rawChange;
+    const livePercent = typeof rawPercent === 'number' ? Number(rawPercent.toFixed(2)) : rawPercent;
+
+    // Clean exchange name (e.g. 'NASDAQ NMS - GLOBAL MARKET' -> 'NASDAQ')
+    const rawExchange = finnhubProfile?.exchange || twelveQuote?.exchange || baseStock.exchange;
+    const cleanExchange = rawExchange?.toUpperCase().includes('NASDAQ') 
+      ? 'NASDAQ' 
+      : rawExchange?.toUpperCase().includes('NEW YORK') || rawExchange?.toUpperCase().includes('NYSE') 
+      ? 'NYSE' 
+      : rawExchange || 'Bolsa';
 
     const sourceTags = [];
     if (twelveQuote) sourceTags.push('Twelve Data (Quote)');
@@ -140,7 +152,7 @@ class MarketDataService {
       symbol: cleanSymbol,
       name: finnhubProfile?.name || twelveQuote?.name || baseStock.name,
       currency: finnhubProfile?.currency || twelveQuote?.currency || baseStock.currency,
-      exchange: finnhubProfile?.exchange || twelveQuote?.exchange || baseStock.exchange,
+      exchange: cleanExchange,
       price: livePrice,
       change: liveChange,
       changePercent: livePercent,

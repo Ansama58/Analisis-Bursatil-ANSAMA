@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LayoutDashboard, LineChart, BrainCircuit, ListOrdered, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import IndicesBar from './components/IndicesBar';
@@ -21,6 +22,7 @@ import { MarketProvider } from './context/MarketContext';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Security & Modals
   const [password, setPassword] = useState('ansama');
@@ -30,11 +32,13 @@ export default function App() {
   return (
     <MarketProvider>
       <div className="flex h-screen w-screen overflow-hidden bg-[#070b18] text-slate-100 font-sans">
-        {/* Lateral Dark Navy Sidebar */}
+        {/* Lateral Dark Navy Sidebar (Desktop & Mobile Drawer) */}
         <Sidebar
           currentScreen={currentScreen}
           setCurrentScreen={setCurrentScreen}
           openModal={setActiveModal}
+          isOpenMobile={isMobileMenuOpen}
+          onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
         {/* Main Terminal Area */}
@@ -43,14 +47,16 @@ export default function App() {
           <Header
             onLockTerminal={() => setIsLocked(true)}
             onOpenSources={() => setActiveModal('sources')}
+            onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)}
+            isMobileMenuOpen={isMobileMenuOpen}
           />
 
           {/* Global Market Indices Ticker Bar */}
           <IndicesBar />
 
           {/* Scrollable Content Viewport */}
-          <main className="flex-1 overflow-y-auto p-6 bg-[#080d1e]">
-            <div className="max-w-[1600px] mx-auto pb-12">
+          <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pb-20 md:pb-12 bg-[#080d1e]">
+            <div className="max-w-[1600px] mx-auto pb-4 md:pb-12">
               <ErrorBoundary>
                 {currentScreen === 'dashboard' && (
                   <DashboardScreen
@@ -96,6 +102,59 @@ export default function App() {
               </ErrorBoundary>
             </div>
           </main>
+
+          {/* Mobile Bottom Navigation Bar (md:hidden) */}
+          <nav className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-[#090f20]/95 backdrop-blur-md border-t border-slate-800 flex items-center justify-around px-2 z-30 select-none">
+            <button
+              onClick={() => { setCurrentScreen('dashboard'); setIsMobileMenuOpen(false); }}
+              className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                currentScreen === 'dashboard' ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px]">Panel</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentScreen('analyzer'); setIsMobileMenuOpen(false); }}
+              className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                currentScreen === 'analyzer' ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <LineChart className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px]">Analizador</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentScreen('ai-report'); setIsMobileMenuOpen(false); }}
+              className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                currentScreen === 'ai-report' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <BrainCircuit className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px]">Informe IA</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentScreen('watchlist'); setIsMobileMenuOpen(false); }}
+              className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                currentScreen === 'watchlist' ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <ListOrdered className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px]">Watchlist</span>
+            </button>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                isMobileMenuOpen ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Menu className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px]">Menú</span>
+            </button>
+          </nav>
         </div>
 
         {/* Modals */}

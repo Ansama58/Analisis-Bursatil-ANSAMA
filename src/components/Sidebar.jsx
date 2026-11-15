@@ -11,10 +11,11 @@ import {
   ShieldCheck, 
   DownloadCloud,
   TrendingUp,
-  Cpu
+  Cpu,
+  X
 } from 'lucide-react';
 
-export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) {
+export default function Sidebar({ currentScreen, setCurrentScreen, openModal, isOpenMobile, onCloseMobile }) {
   const navItems = [
     { id: 'dashboard', label: '1. Panel Principal', icon: LayoutDashboard, badge: 'En Vivo' },
     { id: 'analyzer', label: '2. Analizador de Valores', icon: LineChart },
@@ -25,11 +26,21 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) 
     { id: 'history', label: '7. Histórico y Resultados', icon: History, badge: 'Auditoría' },
   ];
 
-  return (
-    <aside className="w-64 bg-[#090f20] border-r border-slate-800 flex flex-col justify-between shrink-0 select-none z-30">
+  const handleNavClick = (screenId) => {
+    setCurrentScreen(screenId);
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const handleModalClick = (modalName) => {
+    openModal(modalName);
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const sidebarContent = (
+    <div className="flex flex-col justify-between h-full">
       <div>
         {/* Logo & Identity */}
-        <div className="p-5 border-b border-slate-800/80 bg-[#070b18]">
+        <div className="p-5 border-b border-slate-800/80 bg-[#070b18] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-cyan-400 p-[2px] shadow-lg shadow-blue-500/20">
               <div className="w-full h-full bg-[#0b132b] rounded-[10px] flex items-center justify-center">
@@ -44,6 +55,15 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) 
               <p className="text-[11px] text-slate-400 font-medium tracking-wide">ANALYTICS &bull; Terminal IA</p>
             </div>
           </div>
+          {onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="md:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+              title="Cerrar menú"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation list */}
@@ -57,7 +77,7 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) 
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentScreen(item.id)}
+                onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all group ${
                   isActive
                     ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-sm'
@@ -89,28 +109,28 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) 
           Configuración & Datos
         </div>
         <button
-          onClick={() => openModal('aiconfig')}
+          onClick={() => handleModalClick('aiconfig')}
           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-cyan-300 hover:text-cyan-200 hover:bg-blue-950/40 rounded-md transition-colors font-medium"
         >
           <BrainCircuit className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Pesos & Motor IA (Etapa 3)</span>
+          <span>Pesos & Motor IA</span>
         </button>
         <button
-          onClick={() => openModal('sources')}
+          onClick={() => handleModalClick('sources')}
           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-md transition-colors"
         >
           <Database className="w-3.5 h-3.5 text-slate-400" />
           <span>Fuentes de Datos</span>
         </button>
         <button
-          onClick={() => openModal('backup')}
+          onClick={() => handleModalClick('backup')}
           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-md transition-colors"
         >
           <DownloadCloud className="w-3.5 h-3.5 text-slate-400" />
           <span>Copia de Seguridad</span>
         </button>
         <button
-          onClick={() => openModal('auth')}
+          onClick={() => handleModalClick('auth')}
           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-md transition-colors"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -126,6 +146,32 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal }) 
           <Cpu className="w-3.5 h-3.5 text-blue-400" />
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar (Unchanged on Desktop) */}
+      <aside className="hidden md:flex w-64 bg-[#090f20] border-r border-slate-800 flex-col justify-between shrink-0 select-none z-30 h-full">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Slide-in Drawer with Backdrop */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          {/* Backdrop */}
+          <div 
+            onClick={onCloseMobile}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+          />
+          {/* Drawer content */}
+          <aside className="relative w-72 max-w-[85vw] bg-[#090f20] border-r border-slate-800 h-full shadow-2xl z-10 flex flex-col justify-between overflow-y-auto">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
   );
 }

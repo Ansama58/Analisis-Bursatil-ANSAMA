@@ -42,7 +42,7 @@ export default function DashboardScreen({ setCurrentScreen }) {
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
               ANSAMA ANALYTICS v1.0
             </span>
-            <span className="text-xs text-slate-400">Terminal Cuantitativo & IA Multiactor &bull; Etapa 2 (Conexiones)</span>
+            <span className="text-xs text-slate-400">Terminal Cuantitativo & IA Multiactor &bull; Sistema Validado</span>
           </div>
           <h1 className="text-xl font-bold text-white mt-1">Centro de Análisis Bursátil Inteligente</h1>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -159,9 +159,9 @@ export default function DashboardScreen({ setCurrentScreen }) {
 
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono">
                   <div className="text-white font-semibold">
-                    {stock.price} {stock.currency}
+                    {typeof stock.price === 'number' ? stock.price.toFixed(2) : stock.price} {stock.currency}
                     <span className={`ml-2 text-[11px] ${stock.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {stock.change >= 0 ? '+' : ''}{stock.changePercent}%
+                      {stock.change >= 0 ? '+' : ''}{typeof stock.changePercent === 'number' ? stock.changePercent.toFixed(2) : stock.changePercent}%
                     </span>
                   </div>
                   <div className="text-slate-400 text-[11px] flex items-center gap-1">

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Globe2, Clock, Lock, RefreshCw, ChevronDown, Activity, Wifi, Database } from 'lucide-react';
+import { Search, Globe2, Clock, Lock, RefreshCw, ChevronDown, Activity, Wifi, Database, Menu, X } from 'lucide-react';
 import { useMarket } from '../context/MarketContext';
 
-export default function Header({ onLockTerminal, onOpenSources }) {
+export default function Header({ onLockTerminal, onOpenSources, onToggleMobileMenu, isMobileMenuOpen }) {
   const { 
     currentStock, 
     selectTicker, 
@@ -56,10 +56,18 @@ export default function Header({ onLockTerminal, onOpenSources }) {
   }, [searchQuery, searchTickers]);
 
   return (
-    <header className="h-16 bg-[#090f20] border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20">
-      {/* Left: Quick universal search & Active stock badge */}
-      <div className="flex items-center gap-4 flex-1 max-w-xl">
-        <div className="relative w-80">
+    <header className="h-16 bg-[#090f20] border-b border-slate-800 px-3 md:px-6 flex items-center justify-between shrink-0 z-20 gap-2">
+      {/* Mobile Hamburger toggle & Left Quick universal search */}
+      <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-xl min-w-0">
+        <button
+          onClick={onToggleMobileMenu}
+          className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg shrink-0 transition-colors"
+          title="Menú de navegación"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5" />}
+        </button>
+
+        <div className="relative w-full md:w-80">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             {isSearching ? (
               <RefreshCw className="h-4 w-4 text-cyan-400 animate-spin" />
@@ -75,7 +83,7 @@ export default function Header({ onLockTerminal, onOpenSources }) {
               setIsDropdownOpen(true);
             }}
             onFocus={() => setIsDropdownOpen(true)}
-            placeholder="Buscar cualquier ticker (NVDA, MSFT, IBE, SAN, AAPL, TSLA...)"
+            placeholder="Buscar ticker (NVDA, MSFT, IBE, SAN...)"
             className="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-slate-700/80 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
           />
 
@@ -105,17 +113,17 @@ export default function Header({ onLockTerminal, onOpenSources }) {
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 truncate max-w-[200px]">{stock.name}</div>
+                      <div className="text-[11px] text-slate-400 truncate max-w-[180px]">{stock.name}</div>
                     </div>
                     <div className="text-right">
                       {stock.price != null && (
                         <div className="font-mono text-white font-medium">
-                          {stock.price} {stock.currency || '$'}
+                          {typeof stock.price === 'number' ? stock.price.toFixed(2) : stock.price} {stock.currency || '$'}
                         </div>
                       )}
                       {stock.changePercent != null && (
                         <div className={`text-[10px] font-mono ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent}%
+                          {stock.changePercent >= 0 ? '+' : ''}{typeof stock.changePercent === 'number' ? stock.changePercent.toFixed(2) : stock.changePercent}%
                         </div>
                       )}
                     </div>
@@ -132,21 +140,24 @@ export default function Header({ onLockTerminal, onOpenSources }) {
 
         {/* Active stock badge */}
         {currentStock && (
-          <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-[#0b132b] border border-slate-800 rounded-lg">
-            <div className="flex items-center gap-2">
+          <div 
+            className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-[#0b132b] border border-slate-800 rounded-lg shrink-0 whitespace-nowrap"
+            title={`Última cotización oficial de cierre. ${currentStock._dataSource || ''}`}
+          >
+            <div className="flex items-center gap-1.5">
               <span className="font-mono font-extrabold text-sm text-white">{currentStock.symbol}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
-                {currentStock.exchange}
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono truncate max-w-[100px]">
+                {currentStock.exchange?.toUpperCase().includes('NASDAQ') ? 'NASDAQ' : currentStock.exchange || 'Bolsa'}
               </span>
             </div>
             <div className="h-4 w-[1px] bg-slate-700"></div>
-            <div className="font-mono font-semibold text-xs text-white">
-              {currentStock.price} {currentStock.currency}
+            <div className="font-mono font-semibold text-xs text-white whitespace-nowrap">
+              {typeof currentStock.price === 'number' ? currentStock.price.toFixed(2) : currentStock.price} {currentStock.currency}
             </div>
-            <span className={`text-xs font-mono font-bold flex items-center ${
+            <span className={`text-xs font-mono font-bold flex items-center whitespace-nowrap ${
               currentStock.change >= 0 ? 'text-emerald-400' : 'text-rose-400'
             }`}>
-              {currentStock.change >= 0 ? '+' : ''}{currentStock.changePercent}%
+              {currentStock.change >= 0 ? '+' : ''}{typeof currentStock.changePercent === 'number' ? currentStock.changePercent.toFixed(2) : currentStock.changePercent}%
             </span>
           </div>
         )}
@@ -157,16 +168,16 @@ export default function Header({ onLockTerminal, onOpenSources }) {
         {/* Connection status badge (clickable to open SourcesModal) */}
         <button
           onClick={onOpenSources}
-          className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 transition-all font-mono text-[11px] ${
+          className={`px-2.5 md:px-3 py-1.5 rounded-lg border flex items-center gap-1.5 md:gap-2 transition-all font-mono text-[10px] md:text-[11px] shrink-0 ${
             isLiveMode
               ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300 hover:bg-emerald-900/50'
               : 'bg-amber-950/40 border-amber-800 text-amber-300 hover:bg-amber-900/50'
           }`}
-          title="Ver estado de conexiones y configurar claves API"
+          title="Ver estado de conexiones y configurar claves API. Fin de semana: mercados cerrados (se muestra el último precio oficial de cierre)."
         >
-          <span className={`w-2 h-2 rounded-full ${isLiveMode ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+          <span className={`w-2 h-2 rounded-full shrink-0 ${isLiveMode ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
           <span className="font-bold">{isLiveMode ? 'EN VIVO' : 'DEMO/CACHÉ'}</span>
-          <Database className="w-3 h-3 text-slate-400" />
+          <Database className="w-3 h-3 text-slate-400 hidden sm:inline" />
         </button>
 
         {/* Refresh button */}

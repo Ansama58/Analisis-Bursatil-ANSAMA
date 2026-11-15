@@ -174,13 +174,13 @@ export default function ScreenerScreen({ setCurrentScreen }) {
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 text-right text-white font-bold">
-                      {stock.price}
+                    <td className="py-3 px-4 text-right text-white font-bold whitespace-nowrap">
+                      {typeof stock.price === 'number' ? stock.price.toFixed(2) : stock.price} {stock.currency || '$'}
                     </td>
 
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
                       <span className={stock.changePercent >= 0 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                        {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent}%
+                        {stock.changePercent >= 0 ? '+' : ''}{typeof stock.changePercent === 'number' ? stock.changePercent.toFixed(2) : stock.changePercent}%
                       </span>
                     </td>
 

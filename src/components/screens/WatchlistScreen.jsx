@@ -140,15 +140,15 @@ export default function WatchlistScreen({ setCurrentScreen }) {
                     </div>
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-bold text-white">
-                    {stock.price} {stock.currency}
+                  <td className="py-3.5 px-4 text-right font-bold text-white whitespace-nowrap">
+                    {typeof stock.price === 'number' ? stock.price.toFixed(2) : stock.price} {stock.currency}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right">
+                  <td className="py-3.5 px-4 text-right whitespace-nowrap">
                     <span className={`inline-flex items-center font-bold ${
                       stock.change >= 0 ? 'text-emerald-400' : 'text-rose-400'
                     }`}>
-                      {stock.change >= 0 ? '+' : ''}{stock.changePercent}%
+                      {stock.change >= 0 ? '+' : ''}{typeof stock.changePercent === 'number' ? stock.changePercent.toFixed(2) : stock.changePercent}%
                     </span>
                   </td>
 

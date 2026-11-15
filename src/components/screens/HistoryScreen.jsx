@@ -349,12 +349,12 @@ export default function HistoryScreen({ setCurrentScreen }) {
                     {rec.recommendation}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-bold text-slate-300">
-                    {rec.initialPrice}
+                  <td className="py-3.5 px-4 text-right font-bold text-slate-300 whitespace-nowrap">
+                    {typeof rec.initialPrice === 'number' ? rec.initialPrice.toFixed(2) : rec.initialPrice}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-bold text-white">
-                    {rec.currentPrice || rec.initialPrice}
+                  <td className="py-3.5 px-4 text-right font-bold text-white whitespace-nowrap">
+                    {typeof rec.currentPrice === 'number' ? rec.currentPrice.toFixed(2) : (rec.currentPrice || rec.initialPrice)}
                   </td>
 
                   <td className="py-3.5 px-4 text-right text-slate-300">
