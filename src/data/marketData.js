@@ -1,10 +1,11 @@
 // Comprehensive market data for US & European equities & global indices
 export const GLOBAL_INDICES = [
-  { symbol: '^IXIC', name: 'Nasdaq 100', value: 18456.20, change: 142.30, changePercent: 0.78, region: 'US' },
-  { symbol: '^GSPC', name: 'S&P 500', value: 5864.67, change: 24.15, changePercent: 0.41, region: 'US' },
-  { symbol: '^DJI', name: 'Dow Jones', value: 42233.05, change: -48.20, changePercent: -0.11, region: 'US' },
-  { symbol: '^IBEX', name: 'IBEX 35', value: 11894.40, change: 95.80, changePercent: 0.81, region: 'Europe' },
-  { symbol: '^STOXX50E', name: 'Euro Stoxx 50', value: 4982.10, change: 32.40, changePercent: 0.65, region: 'Europe' },
+  { symbol: '^DJI', name: 'Dow Jones', value: 52347.55, change: 50.46, changePercent: 0.10, region: 'US' },
+  { symbol: '^GSPC', name: 'S&P 500', value: 7561.67, change: -30.73, changePercent: -0.40, region: 'US' },
+  { symbol: '^IXIC', name: 'Nasdaq', value: 25136.27, change: -229.82, changePercent: -0.91, region: 'US' },
+  { symbol: '^RUT', name: 'Russell 2000', value: 2790.49, change: -12.30, changePercent: -0.44, region: 'US' },
+  { symbol: '^IBEX', name: 'IBEX 35', value: 11895.40, change: 35.20, changePercent: 0.30, region: 'Europe' },
+  { symbol: '^STOXX50E', name: 'Euro Stoxx 50', value: 4981.76, change: -15.30, changePercent: -0.31, region: 'Europe' },
 ];
 
 export const STOCKS_DATA = {

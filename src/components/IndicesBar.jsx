@@ -15,9 +15,9 @@ export default function IndicesBar() {
 
         <div className="flex items-center gap-6 shrink-0 font-mono">
           {indices.map((index) => {
-            const isPositive = index.change >= 0;
+            const isPositive = (index.change ?? index.changePercent) >= 0;
             return (
-              <div key={index.symbol} className="flex items-center gap-2 group cursor-default">
+              <div key={index.symbol} className="flex items-center gap-2 group cursor-default whitespace-nowrap">
                 <span className="text-slate-400 font-semibold group-hover:text-slate-200 transition-colors">
                   {index.name}
                 </span>
@@ -34,7 +34,7 @@ export default function IndicesBar() {
                   ) : (
                     <TrendingDown className="w-3 h-3 mr-0.5 inline" />
                   )}
-                  {isPositive ? '+' : ''}{index.changePercent}%
+                  {isPositive ? '+' : ''}{typeof index.changePercent === 'number' ? index.changePercent.toFixed(2) : index.changePercent}%
                 </span>
               </div>
             );

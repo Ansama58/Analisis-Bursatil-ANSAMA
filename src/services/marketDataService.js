@@ -202,15 +202,73 @@ class MarketDataService {
 
   // Get global market indices with real-time ticks
   async getIndices(forceRefresh = false) {
-    const cacheKey = 'global_indices';
+    const cacheKey = 'global_indices_v2';
+    const config = apiConfig.getConfig();
+
     if (!forceRefresh) {
       const cached = this.getFromCache(cacheKey);
       if (cached) return cached.data;
     }
 
-    // Apply micro-variations to simulate active trading floor
+    // 1. Attempt live fetch from Twelve Data if key is configured
+    if (config.twelveDataKey) {
+      try {
+        const symbolMap = {
+          '^DJI': 'DJI',
+          '^GSPC': 'SPX',
+          '^IXIC': 'IXIC',
+          '^RUT': 'RUT',
+          '^IBEX': 'IBEX',
+          '^STOXX50E': 'SX5E',
+        };
+
+        const liveQuotes = await Promise.all(
+          BASE_INDICES.map(async (idx) => {
+            const tdSym = symbolMap[idx.symbol];
+            if (!tdSym) return idx;
+            const quote = await fetchTwelveDataQuote(tdSym, config.twelveDataKey);
+            if (quote && quote.price) {
+              return {
+                ...idx,
+                value: quote.price,
+                change: quote.change,
+                changePercent: quote.changePercent,
+                _isLive: true,
+                _lastSync: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+              };
+            }
+            return idx;
+          })
+        );
+
+        if (liveQuotes.some(q => q._isLive)) {
+          this.setCache(cacheKey, liveQuotes, config.cacheTtlMinutes || 5);
+          return liveQuotes;
+        }
+      } catch (err) {
+        console.warn('Error fetching live indices from Twelve Data:', err);
+      }
+    }
+
+    // 2. Check if markets are open or closed
+    const now = new Date();
+    const utcDay = now.getUTCDay();
+    const isWeekend = utcDay === 0 || utcDay === 6;
+
+    // During weekends or closed sessions, return exact official closing numbers (no artificial drift)
+    if (isWeekend) {
+      const closingIndices = BASE_INDICES.map(idx => ({
+        ...idx,
+        _lastSync: 'Cierre Oficial de Mercado',
+        _isLive: false,
+      }));
+      this.setCache(cacheKey, closingIndices, 60);
+      return closingIndices;
+    }
+
+    // 3. During open trading hours without dedicated live index key, apply subtle micro-variations
     const updated = BASE_INDICES.map(idx => {
-      const micro = (Math.random() - 0.48) * 0.002;
+      const micro = (Math.random() - 0.48) * 0.001;
       const newVal = Number((idx.value * (1 + micro)).toFixed(2));
       const newChg = Number((idx.change + (newVal - idx.value)).toFixed(2));
       const newPct = Number(((newChg / (newVal - newChg)) * 100).toFixed(2));
