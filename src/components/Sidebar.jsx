@@ -173,5 +173,3 @@ export default function Sidebar({ currentScreen, setCurrentScreen, openModal, is
     </>
   );
 }
-  );
-}
